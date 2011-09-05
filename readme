@@ -1,0 +1,27 @@
+
+## 動作の解説が http://slidesha.re/p0MEsk にあります。
+
+Warning:
+    ・ 動作には MongoDB/Python2.x が必要です
+    ・ データベースへ入れるためのファイルは用意してありますが、データ自体の再配布はしていません。
+    ・ 俺々スパゲッティコードです（試行錯誤の名残で無駄な関数もあります）
+    ・ スライドにある「編集距離2」の部分は計算していません。（数行くらい変えるだけでできるとは思います）
+
+Files:
+    ipadic.py     - IPA辞書をMongoDBに入れるためのファイルです。下記の手順で使用できます。
+    spelling.py   - スペル修正プログラムの本体です。MongoDBにIPA辞書がないと動きません。
+    japaneses.txt - 漢字などの文字が入ったファイルです。編集距離の計算に使います。
+
+Inserting to mongoDB（バージョン部分は最新版に合わせて変えてください）:
+    ( http://sourceforge.net/projects/mecab/files/mecab-ipadic/ )から最新版のIPA辞書をダウンロード
+    $ tar zxvf mecab-ipadic-2.7.0-20070801.tar.gz
+    $ cd ipadic_mecab-ipadic-2.7.0-20070801
+    $ sudo apt-get install nkf
+    $ nkf -w *.csv > all.csv
+    $ mongoimport --db ipadic --collection all --type csv -f word,left-id,right-id,cost,pos,detail1,detail2,detail3,conjCol,conjForm,original,kana,speak --file all.csv
+    $ python ipadic.py  ## 完了まで数十秒くらいの時間がかかります
+    $ touch japanese.txt
+    $ python japanese_chars.py
+
+Run:
+    $ python spelling.py <誤字>
